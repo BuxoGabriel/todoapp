@@ -1,0 +1,36 @@
+{
+  "name": "todoapp",
+  "version": "0.0.0",
+  "description": "A simple todo app",
+  "main": "build/index.js",
+  "scripts": {
+    "dev": "concurrently \"tsc -w\" \"nodemon -q build\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BuxoGabriel/todoapp.git"
+  },
+  "keywords": [
+    "todo"
+  ],
+  "author": "Gabriel Buxo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BuxoGabriel/todoapp/issues"
+  },
+  "homepage": "https://github.com/BuxoGabriel/todoapp#readme",
+  "devDependencies": {
+    "@types/node": "^20.8.2",
+    "concurrently": "^8.2.1",
+    "gts": "^5.2.0",
+    "nodemon": "^3.0.1",
+    "tailwind": "^4.0.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.18",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  }
+}
