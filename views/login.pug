@@ -1,0 +1,20 @@
+extends layout.pug 
+
+block content 
+    .bg-gradient-to-tl.from-indigo-200.via-red-200.to-yellow-100.w-full.h-full
+        .bg-gradient-to-tl.from-yellow-100.via-red-200.to-indigo-200.flex.flex-col.items-center.justify-center.min-h-screen.w-full.max-w-md.mx-auto.p-6.bg-white.rounded-lg.shadow-md
+            h1.text-2xl.font-semibold.text-center.mb-4 Login
+            form(action="/login" method="POST")
+                .mb-4
+                    label.block.text-grey-700.text-sm.font-bold.mb-2(for="username") Username
+                    input(id="username" type="username" name="username" placeholder="Enter your username" required autofocus 
+                        class="w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-200")
+                .mb-6 
+                    label.block.text-grey-700.text-sm.font-bold.mb-2(for="password") Password 
+                    input(id="password" type="password" name="password" placeholder="Enter your password" required 
+                        class="w-full p-2 border border-grey-300 rounded-md focus:ring focus:ring-blue-200")
+                button(type="submit"
+                    class="w-full bg-blue-500 text-white p-2 text-center rounded-md hover:bg-blue-600 focus:ring focus:ring-blue-200") Login
+            p.text-grey-600.text-xs.mt-2.text-center
+                | Dont have an account? 
+                a(href="/register" class="text-blue-500 hover:underline") Sign Up
