@@ -59,7 +59,10 @@ export function expressAuth(req: any, res: Response, next: NextFunction) {
 }
 
 export function requireAuth(req: any, res: Response, next: NextFunction) {
-    if(req.expired) res.status(401).redirect("/login/?error=Login token expired")
+    if(req.expired) {
+        res.status(401).redirect("/login/?error=Login token expired")
+        return
+    }
     if (!req.token) {
         res.status(401).redirect("/login/?error=You are not logged in")
         return
