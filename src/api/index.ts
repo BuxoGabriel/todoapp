@@ -24,12 +24,13 @@ function createApiRouter(): Router {
                 res.sendStatus(400)
             }
             const { username, password } = req.body
-            if (await authenticateUser(username, password)) {
-                const token = createJWT(username)
+            const user = await authenticateUser(username, password)
+            if (user != null) {
+                const token = createJWT(user.username)
                 res.redirect(`/todo/?token=${token}`)
             } else {
                 // If authentication fails send back 401 unauthorized error
-                res.redirect("/login/?error=wrong username or password")
+                res.redirect("/login/?error=Wrong username or password")
             }
         })
     ])
