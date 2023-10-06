@@ -13,8 +13,10 @@ block content
             form.flex.space-x-2.w-full.px-6
                 input(type="text" id="task" placeholder="Enter Task Here ..." class="w-full p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500")
                 button.w-20.h-14.text-lg.p-4.bg-blue-500.text-white.rounded-md(type="submit") Add
-            ul.mt-4.w-full.px-6
+            ul.mt-4.w-full.px-6.pt-4
                 each task in tasks
-                    li(class="py-2 border-b last:border-b-0 border-gray-300 flex items-center")
-                        input(type="checkbox" id=task.id checked=task.completed class="mr-2") 
-                        label.ml-2.capitalize(for=task.id)=task.text
+                    li(class="py-4 border-b last:border-b-0 border-gray-300 flex items-center relative")
+                        - var cbid = "checkbox " + task.id
+                        input(type="checkbox" id=cbid checked=task.completed class="mr-2") 
+                        label.ml-2.capitalize(for=cbid)=task.text
+                        button.right-2.w-8.h-8.bg-red-400.text-lg.font-semibold.rounded-md.border.border-gray-300.absolute.delete(type="button" id=task.id) x

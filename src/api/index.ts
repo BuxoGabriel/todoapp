@@ -79,6 +79,28 @@ function createApiRouter(): Router {
             res.sendStatus(200);
         })
     ])
+
+    router.delete("/todo/:id", asyncHandler(async (req, res, next) => {
+        const user = auth(req)
+        const id = parseInt(req.params.id)
+        if(isNaN(id) || !user) {
+            res.sendStatus(400)
+            return
+        }
+        const prisma = getPrismaClient()
+        const todo = await prisma.todo.delete({where: {
+            userId : user.id,
+            id
+        }})
+
+        if(todo) {
+            res.sendStatus(200)
+            return
+        } else {
+            res.sendStatus(400)
+            return
+        }
+    }))
     return router
 }
 

@@ -15,8 +15,8 @@ function handleCheckboxClicked(e) {
     checkboxTimeout = setTimeout(() => {
         const headers = new Headers()
         headers.set("Authorization", "Bearer " + jwt)
-        fetch("/api/check", {
-            method: "POST",
+        fetch("/api/todo", {
+            method: "PUT",
             headers,
             body: {checked}
         }).then(res => {
@@ -49,5 +49,27 @@ function handleSubmit(e) {
     taskDom.value = ""
 }
 
+
+/**
+ * 
+ * @param {Event} e 
+ */
+function handleDeleteClicked(e) {
+    e.preventDefault()
+    const headers = new Headers()
+    headers.set("Authorization", "Bearer " + jwt)
+    fetch("/api/todo/" + e.target.id, {
+        method: "DELETE",
+        headers,
+    }).then(res => {
+        if(!res.ok) {
+            if(res.status == 401) window.location.reload()
+            else res.json().then(err => err.forEach(e => console.error(e)))
+        }
+        else window.location.reload()
+    })
+}
+
 document.querySelector("form").addEventListener("submit", handleSubmit)
 document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.addEventListener("click", handleCheckboxClicked))
+document.querySelectorAll(".delete").forEach(db => db.addEventListener("click", handleDeleteClicked))
