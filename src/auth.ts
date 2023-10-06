@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { randomBytes } from "crypto";
 import jwt from "jsonwebtoken"
+import { getPrismaClient } from ".";
 
 const TOKEN_DURR = '1h'
 const KEY_LEN = 32
@@ -11,9 +12,20 @@ export type User = {
     username: string
 }
 
-export function authenticateUser(username: string, password: string): boolean {
-    if (username == "username" && password == "password") return true
+export async function authenticateUser(username: string, password: string): Promise<boolean> {
+    const prisma = getPrismaClient()
+    const user = await prisma.user.findFirst({
+        where: {username, password}
+    })
+    if (user) return true
     else return false
+}
+
+export async function createUser(username: string, password: string): Promise<User> {
+    const prisma = getPrismaClient()
+    return await prisma.user.create({
+        data: {username, password}
+    })
 }
 
 export function createJWT(username: string): string {
@@ -23,14 +35,20 @@ export function createJWT(username: string): string {
 export function expressAuth(req: any, res: Response, next: NextFunction) {
     let token = req.query.token
     if (token) {
-        req.token = jwt.verify(token as string, secretKey) as User
+        try {
+            req.token = jwt.verify(token as string, secretKey) as User
+        }
+        catch(jwtError) {
+            res.status(401).redirect("/login/?error=Login Token Expired")
+            return
+        }
     }
     next()
 }
 
 export function requireAuth(req: any, res: Response, next: NextFunction) {
     if (!req.token) {
-        res.status(401).json({ error: "You are not logged in" })
+        res.status(401).redirect("/login/?error=You are not logged in")
     } else next()
 }
 

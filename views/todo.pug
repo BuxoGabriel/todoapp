@@ -1,4 +1,17 @@
-extends layout.pug 
+extends layout.pug
 
-block content 
-    h1.text-xl=username
+block content
+    .bg-gradient-to-tl.from-indigo-200.via-red-200.to-yellow-100.w-full.h-screen.flex.flex-col.items-center.justify-center
+        .bg-gray-100.w-full.max-w-md.border.p-6.rounded-lg.shadow-md.text-center.flex.flex-col.items-center.min-h-screen.mx-auto.relative
+            a(href="/login")
+                button.absolute.top-4.right-4.w-20.h-14.text-m.p-2.bg-red-500.text-white.rounded-md(type="button") Log Out
+            header.p-4.border-b.border-gray-300
+                h1.pt-8.text-2xl.font-semibold.mb-2 TODOS
+            form.flex.space-x-2.w-full.px-6
+                input(type="text" placeholder="Enter Task Here ..." class="w-full p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:border-blue-500")
+                button.w-20.h-14.text-lg.p-4.bg-blue-500.text-white.rounded-md(type="submit") Add
+            ul.mt-4.w-full.px-6
+                each task in tasks
+                    li(class="py-2 border-b last:border-b-0 border-gray-300 flex items-center")
+                        input(type="checkbox" id=task.id checked=task.completed class="mr-2") 
+                        label.ml-2.capitalize(for=task.id)=task.text
