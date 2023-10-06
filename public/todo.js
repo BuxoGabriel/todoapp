@@ -10,17 +10,23 @@ const taskDom = document.querySelector("#task")
  * @param {Event} e 
  */
 function handleCheckboxClicked(e) {
-    const checked = e.target.checked
     clearTimeout(checkboxTimeout)
     checkboxTimeout = setTimeout(() => {
+        const id = e.target.id.split(" ")[1]
+        const completed = e.target.checked
+        console.log(completed)
         const headers = new Headers()
         headers.set("Authorization", "Bearer " + jwt)
+        headers.set("Content-Type", "application/json")
         fetch("/api/todo", {
             method: "PUT",
             headers,
-            body: {checked}
+            body: JSON.stringify({id, completed})
         }).then(res => {
-            if(!res.ok) window.location.reload()
+            if(!res.ok) {
+                if(res.status == 401) window.location.reload()
+                else res.json().then(err => err.forEach(e => console.error(e)))
+            } else window.location.reload()
         })
     }, throttleTime)
 }

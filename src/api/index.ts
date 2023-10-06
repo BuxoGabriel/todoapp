@@ -64,8 +64,7 @@ function createApiRouter(): Router {
         asyncHandler(async (req, res, next) => {
             const errors = validationResult(req)
             if (!errors.isEmpty()) {
-                console.error(errors)
-                res.status(400).json(errors.array())
+                res.sendStatus(400)
                 return
             }
             const user = auth(req)
@@ -77,6 +76,44 @@ function createApiRouter(): Router {
                 userId: user.id
             }})
             res.sendStatus(200);
+            return
+        })
+    ])
+
+    router.put("/todo", [
+        body("id")
+            .trim()
+            .isNumeric()
+            .escape(),
+        body("completed")
+            .isBoolean()
+            .escape(),
+        asyncHandler(async (req, res, next) => {
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                res.status(400).json(errors.array())
+                return
+            }
+            const user = auth(req)
+            const id = parseInt(req.body.id)
+            const completed = req.body.completed === "true"
+            if(!user || isNaN(id)) {
+                res.sendStatus(400)
+                return
+            }
+            const prisma = getPrismaClient()
+            const todo = await prisma.todo.update({
+                data: { completed },
+                where: {id, userId: user.id},
+                
+            })
+            if(todo) {
+                res.sendStatus(200)
+                return
+            } else {
+                res.sendStatus(400)
+                return
+            }
         })
     ])
 

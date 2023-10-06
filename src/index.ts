@@ -45,6 +45,9 @@ app.get("/todo", asyncHandler(async (req, res) => {
     const tasks = await prisma.todo.findMany({
         where: {
             userId: id
+        },
+        orderBy: {
+            date: "asc"
         }
     })
     res.render("todo", {username, tasks})
