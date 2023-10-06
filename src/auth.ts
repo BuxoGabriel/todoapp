@@ -12,7 +12,8 @@ console.log(`Secret jwt key: ${secretKey}`)
 
 export type User = {
     username: string,
-    joined: Date
+    joined: Date,
+    id: number
 }
 
 export async function authenticateUser(username: string, password: string): Promise<User | null> {
@@ -22,7 +23,7 @@ export async function authenticateUser(username: string, password: string): Prom
     })
     if (user) {
         const hashpass = await hash(password, user.salt)
-        if(hashpass == user.password) return {username: user.username, joined: user.joined}
+        if(hashpass == user.password) return {username: user.username, joined: user.joined, id: user.id}
         else return null
     }
     else return null
@@ -37,30 +38,34 @@ export async function createUser(username: string, password: string): Promise<Us
     })
 }
 
-export function createJWT(username: string): string {
-    return jwt.sign({ username }, secretKey, { expiresIn: TOKEN_DURR })
+export function createJWT(username: string, id: number): string {
+    return jwt.sign({ username, id }, secretKey, { expiresIn: TOKEN_DURR })
 }
 
 export function expressAuth(req: any, res: Response, next: NextFunction) {
     let token = req.query.token
-    if (token) {
-        try {
-            req.token = jwt.verify(token as string, secretKey) as User
-        }
-        catch(jwtError) {
-            res.status(401).redirect("/login/?error=Login Token Expired")
-            return
-        }
+    if (!token) {
+        const authorization: string | undefined = req.headers.authorization
+        if(authorization) token = authorization.split(" ")[1]
+    }
+    try {
+        req.token = jwt.verify(token as string, secretKey) as User
+    }
+    catch(jwtError) {
+        req.expired = true
+        req.token = null
     }
     next()
 }
 
 export function requireAuth(req: any, res: Response, next: NextFunction) {
+    if(req.expired) res.status(401).redirect("/login/?error=Login token expired")
     if (!req.token) {
         res.status(401).redirect("/login/?error=You are not logged in")
+        return
     } else next()
 }
 
-export function auth(req: any) {
+export function auth(req: any): User | undefined {
     return req.token
 }

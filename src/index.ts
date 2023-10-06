@@ -1,5 +1,6 @@
 import path from "path"
 import express from "express"
+import asyncHandler from "express-async-handler"
 import dotenv from "dotenv"
 import { PrismaClient } from "@prisma/client"
 
@@ -36,11 +37,16 @@ app.get("/register", (req, res) => {
 })
 
 app.get("/todo", requireAuth)
-app.get("/todo", (req, res) => {
-    const {username} = auth(req)
-    const tasks =[{text: "thing 1", id: 1, completed: false}]
+app.get("/todo", asyncHandler(async (req, res) => {
+    const prisma = getPrismaClient()
+    const {username, id} = auth(req)!
+    const tasks = await prisma.todo.findMany({
+        where: {
+            userId: id
+        }
+    })
     res.render("todo", {username, tasks})
-})
+}))
 
 app.use("/api", apiRouter)
 
