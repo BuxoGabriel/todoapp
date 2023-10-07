@@ -23,8 +23,15 @@ function createApiRouter(): Router {
                 res.sendStatus(400)
             }
             const { username, password } = req.body
-            const user = await authenticateUser(username, password)
-            if (user != null) {
+            let user
+            try {
+                user = await authenticateUser(username, password)
+            }  catch(err) {
+                console.error(err)
+                res.sendStatus(500)
+                return
+            }
+            if(user != null) {
                 const token = createJWT(user.username, user.id)
                 res.redirect(`/todo/?token=${token}`)
             } else {
@@ -50,7 +57,14 @@ function createApiRouter(): Router {
                 res.sendStatus(400)
             }
             const { username, password } = req.body
-            const user = await createUser(username, password)
+            let user
+            try {
+                user = await createUser(username, password)
+            } catch(err) {
+                console.error(err)
+                res.sendStatus(500)
+                return
+            }
             const token = createJWT(username, user.id)
             res.redirect(`/todo/?token=${token}`)
         })
@@ -71,11 +85,18 @@ function createApiRouter(): Router {
             const prisma = getPrismaClient()
             const task = req.body.task
             if(!user) {res.sendStatus(401); return}
-            await prisma.todo.create({data: {
-                text: task,
-                userId: user.id
-            }})
-            res.sendStatus(200);
+            let newTodo 
+            try {
+                newTodo = await prisma.todo.create({data: {
+                    text: task,
+                    userId: user.id
+                }})
+            } catch(err) {
+                console.error(err)
+                res.sendStatus(500)
+                return
+            }
+            res.json(newTodo)
             return
         })
     ])
@@ -102,11 +123,18 @@ function createApiRouter(): Router {
                 return
             }
             const prisma = getPrismaClient()
-            const todo = await prisma.todo.update({
-                data: { completed },
-                where: {id, userId: user.id},
-                
-            })
+            let todo
+            try {
+                todo = await prisma.todo.update({
+                    data: { completed },
+                    where: {id, userId: user.id},
+                    
+                })
+            } catch(err) {
+                console.error(err)
+                res.sendStatus(500)
+                return
+            }
             if(todo) {
                 res.sendStatus(200)
                 return
@@ -125,10 +153,17 @@ function createApiRouter(): Router {
             return
         }
         const prisma = getPrismaClient()
-        const todo = await prisma.todo.delete({where: {
-            userId : user.id,
-            id
-        }})
+        let todo
+        try {
+            todo = await prisma.todo.delete({where: {
+                userId : user.id,
+                id
+            }})
+        } catch(err) {
+            console.error(err)
+            res.sendStatus(500)
+            return
+        }
 
         if(todo) {
             res.sendStatus(200)

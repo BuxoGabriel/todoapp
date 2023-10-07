@@ -42,14 +42,21 @@ app.get("/todo", requireAuth)
 app.get("/todo", asyncHandler(async (req, res) => {
     const prisma = getPrismaClient()
     const {username, id} = auth(req)!
-    const tasks = await prisma.todo.findMany({
-        where: {
-            userId: id
-        },
-        orderBy: {
-            date: "asc"
-        }
-    })
+    let tasks
+    try {
+        tasks = await prisma.todo.findMany({
+            where: {
+                userId: id
+            },
+            orderBy: {
+                date: "asc"
+            }
+        })
+    } catch(err) {
+        console.error(err)
+        res.sendStatus(500)
+        return
+    }
     res.render("todo", {username, tasks})
 }))
 
