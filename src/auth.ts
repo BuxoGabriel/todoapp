@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response } from "express";
 import { randomBytes } from "crypto";
 import { genSalt, hash } from "bcrypt";
 import jwt from "jsonwebtoken"
 import { getPrismaClient } from ".";
+import { AuthReq } from "./middleware/auth";
+import { Request } from "express";
 
 const SALT_ROUNDS = 10
 const TOKEN_DURR = '1h'
@@ -15,6 +16,8 @@ export type User = {
     joined: Date,
     id: number
 }
+
+export const getJwtKey = () => secretKey
 
 export async function authenticateUser(username: string, password: string): Promise<User | null> {
     const prisma = getPrismaClient()
@@ -42,33 +45,10 @@ export function createJWT(username: string, id: number): string {
     return jwt.sign({ username, id }, secretKey, { expiresIn: TOKEN_DURR })
 }
 
-export function expressAuth(req: any, res: Response, next: NextFunction) {
-    let token = req.query.token
-    if (!token) {
-        const authorization: string | undefined = req.headers.authorization
-        if(authorization) token = authorization.split(" ")[1]
+export function auth(req: Request): User | null {
+    if('token' in req) {
+        const authReq = req as AuthReq
+        return authReq.token
     }
-    try {
-        req.token = jwt.verify(token as string, secretKey) as User
-    }
-    catch(jwtError) {
-        req.expired = true
-        req.token = null
-    }
-    next()
-}
-
-export function requireAuth(req: any, res: Response, next: NextFunction) {
-    if(req.expired) {
-        res.status(401).redirect("/login/?error=Login token expired")
-        return
-    }
-    if (!req.token) {
-        res.status(401).redirect("/login/?error=You are not logged in")
-        return
-    } else next()
-}
-
-export function auth(req: any): User | undefined {
-    return req.token
+    return null;
 }

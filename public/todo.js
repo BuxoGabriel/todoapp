@@ -20,7 +20,6 @@ function dbounce(fn) {
 function handleCheckboxClicked(e) {
     const id = e.target.id.split(" ")[1]
     const completed = e.target.checked
-    console.log(completed)
     const headers = new Headers()
     headers.set("Authorization", "Bearer " + jwt)
     headers.set("Content-Type", "application/json")

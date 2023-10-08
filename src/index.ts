@@ -1,12 +1,12 @@
 import path from "path"
 import express from "express"
-import asyncHandler from "express-async-handler"
 import logger from "morgan"
 import dotenv from "dotenv"
 import { PrismaClient } from "@prisma/client"
 
+import appRouter from "./routes"
+import { expressAuth } from "./middleware/auth"
 import apiRouter from "./api"
-import { auth, expressAuth, requireAuth } from "./auth"
 dotenv.config()
 
 const prisma = new PrismaClient()
@@ -25,46 +25,13 @@ app.use(express.static(path.join(__dirname, '../public')))
 app.set('views', path.join(__dirname, '../views'))
 app.set("view engine", "pug")
 
-app.get("/", (req, res, next) => {
-    req.url = "/login"
-    next()
-})
-
-app.get("/login", (req, res) => {
-    res.render("login", {title: "Todo App login", error: req.query.error})
-})
-
-app.get("/register", (req, res) => {
-    res.render("register", {title: "Todo App register"})
-})
-
-app.get("/todo", requireAuth)
-app.get("/todo", asyncHandler(async (req, res) => {
-    const prisma = getPrismaClient()
-    const {username, id} = auth(req)!
-    let tasks
-    try {
-        tasks = await prisma.todo.findMany({
-            where: {
-                userId: id
-            },
-            orderBy: {
-                date: "asc"
-            }
-        })
-    } catch(err) {
-        console.error(err)
-        res.sendStatus(500)
-        return
-    }
-    res.render("todo", {username, tasks})
-}))
-
+app.use(appRouter)
 app.use("/api", apiRouter)
 
 app.listen(PORT, () => {
     console.log("listening on port " + PORT)
 })
+
 
 async function gracefulShutdown() {
     await prisma.$disconnect()

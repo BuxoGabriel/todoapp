@@ -4,7 +4,7 @@ block content
     .bg-gradient-to-tl.from-indigo-200.via-red-200.to-yellow-100.w-full.h-full
         .bg-gradient-to-tl.from-yellow-100.via-red-200.to-indigo-200.flex.flex-col.items-center.justify-center.min-h-screen.w-full.max-w-md.mx-auto.p-6.rounded-lg.shadow-md
             h1.text-2xl.font-semibold.text-center.mb-4 Login
-            form(action="/api/login" method="POST")
+            form(action="/login" method="POST")
                 .mb-4
                     label.block.text-grey-700.text-sm.font-bold.mb-2(for="username") Username
                     input(id="username" type="username" name="username" placeholder="Enter your username" required autofocus
