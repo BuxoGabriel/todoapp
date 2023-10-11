@@ -1,4 +1,5 @@
 import path from "path"
+import { randomBytes } from "crypto"
 import express from "express"
 import logger from "morgan"
 import dotenv from "dotenv"
@@ -10,6 +11,8 @@ import apiRouter from "./api"
 import { auth } from "./middleware/auth"
 dotenv.config()
 
+const KEY_LEN = 32
+const cookieKey = randomBytes(KEY_LEN).toString("hex")
 const prisma = new PrismaClient()
 
 export const getPrismaClient = () => prisma
@@ -19,7 +22,7 @@ const app = express()
 
 app.use(logger("dev"))
 app.use(express.json())
-app.use(cookieParser())
+app.use(cookieParser(cookieKey))
 app.use(express.urlencoded({ extended: false }))
 app.use(auth)
 
