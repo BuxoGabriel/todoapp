@@ -2,11 +2,12 @@ import path from "path"
 import express from "express"
 import logger from "morgan"
 import dotenv from "dotenv"
+import cookieParser from "cookie-parser"
 import { PrismaClient } from "@prisma/client"
 
 import appRouter from "./routes"
-import { expressAuth } from "./middleware/auth"
 import apiRouter from "./api"
+import { auth } from "./middleware/auth"
 dotenv.config()
 
 const prisma = new PrismaClient()
@@ -18,8 +19,9 @@ const app = express()
 
 app.use(logger("dev"))
 app.use(express.json())
+app.use(cookieParser())
 app.use(express.urlencoded({ extended: false }))
-app.use(expressAuth)
+app.use(auth)
 
 app.use(express.static(path.join(__dirname, '../public')))
 app.set('views', path.join(__dirname, '../views'))
@@ -31,7 +33,6 @@ app.use("/api", apiRouter)
 app.listen(PORT, () => {
     console.log("listening on port " + PORT)
 })
-
 
 async function gracefulShutdown() {
     await prisma.$disconnect()

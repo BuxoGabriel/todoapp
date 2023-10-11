@@ -1,5 +1,4 @@
-const jwt = window.location.href.split("?token=")[1]
-const debounceTime = 1000 * 0.75
+const debounceTime = 1000 * 1
 
 const taskClass = "py-4 border-b last:border-b-0 border-gray-300 flex items-center relative"
 const checkboxClass = "mr-2"
@@ -21,7 +20,6 @@ function handleCheckboxClicked(e) {
     const id = e.target.id.split(" ")[1]
     const completed = e.target.checked
     const headers = new Headers()
-    headers.set("Authorization", "Bearer " + jwt)
     headers.set("Content-Type", "application/json")
     fetch("/api/todo", {
         method: "PUT",
@@ -37,9 +35,6 @@ function handleCheckboxClicked(e) {
 
 function handleSubmit(e) {
     e.preventDefault()
-    const headers = new Headers()
-    headers.set("Authorization", "Bearer " + jwt)
-    headers.set("Content-Type", "application/json")
     let task = taskDom.value
     if(task) {
         // init new task
@@ -67,6 +62,8 @@ function handleSubmit(e) {
         taskList.appendChild(newTask)
 
         // update ids to have db todo id
+        const headers = new Headers()
+        headers.set("Content-Type", "application/json")
         fetch("/api/todo", {
             method: "POST",
             headers,
@@ -97,11 +94,8 @@ function handleSubmit(e) {
  */
 function handleDeleteClicked(e) {
     e.preventDefault()
-    const headers = new Headers()
-    headers.set("Authorization", "Bearer " + jwt)
     fetch("/api/todo/" + e.target.id, {
         method: "DELETE",
-        headers,
     }).then(res => {
         if(!res.ok) {
             if(res.status == 401) window.location.reload()
@@ -112,6 +106,6 @@ function handleDeleteClicked(e) {
     let element = e.target.parentElement.parentElement.removeChild(e.target.parentElement)
 }
 
-document.querySelector("form").addEventListener("submit", handleSubmit)
+document.getElementById("new-task-form").addEventListener("submit", handleSubmit)
 document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.addEventListener("click", dbounce(handleCheckboxClicked)))
 document.querySelectorAll(".delete").forEach(db => db.addEventListener("click", handleDeleteClicked))

@@ -2,8 +2,8 @@ import { NextFunction, Request, Response, Router } from "express"
 import asyncHandler from "express-async-handler"
 import { body, validationResult } from "express-validator"
 
-import { auth } from "../auth"
 import { getPrismaClient } from ".."
+import { getAuth } from "../middleware/auth"
 
 const todoApi = Router()
 
@@ -18,7 +18,7 @@ todoApi.post("/", [
             res.sendStatus(400)
             return
         }
-        const user = auth(req)
+        const user = getAuth(req)
         const prisma = getPrismaClient()
         const task = req.body.task
         if(!user) {res.sendStatus(401); return}
@@ -52,10 +52,14 @@ todoApi.put("/", [
             res.status(400).json(errors.array())
             return
         }
-        const user = auth(req)
+        const user = getAuth(req)
         const id = parseInt(req.body.id)
         const completed = req.body.completed === "true"
-        if(!user || isNaN(id)) {
+        if(!user) {
+            res.sendStatus(401)
+            return
+        }
+        if(isNaN(id)) {
             res.sendStatus(400)
             return
         }
@@ -83,7 +87,7 @@ todoApi.put("/", [
 ])
 
 todoApi.delete("/:id", asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const user = auth(req)
+    const user = getAuth(req)
     const id = parseInt(req.params.id)
     if(isNaN(id) || !user) {
         res.sendStatus(400)

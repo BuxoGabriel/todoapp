@@ -2,8 +2,6 @@ import { randomBytes } from "crypto";
 import { genSalt, hash } from "bcrypt";
 import jwt from "jsonwebtoken"
 import { getPrismaClient } from ".";
-import { AuthReq } from "./middleware/auth";
-import { Request } from "express";
 
 const SALT_ROUNDS = 10
 const TOKEN_DURR = '1h'
@@ -43,12 +41,4 @@ export async function createUser(username: string, password: string): Promise<Us
 
 export function createJWT(username: string, id: number): string {
     return jwt.sign({ username, id }, secretKey, { expiresIn: TOKEN_DURR })
-}
-
-export function auth(req: Request): User | null {
-    if('token' in req) {
-        const authReq = req as AuthReq
-        return authReq.token
-    }
-    return null;
 }

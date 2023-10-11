@@ -1,15 +1,14 @@
 import { Router } from "express"
 import asyncHandler from "express-async-handler"
 import { getPrismaClient } from ".."
-import { pageRequireAuth } from "../middleware/auth"
-import { auth } from "../auth"
+import { getAuth, pageRequireAuth } from "../middleware/auth"
 
 const todoRouter = Router()
 
 todoRouter.get("/", pageRequireAuth)
 todoRouter.get("/", asyncHandler(async (req, res) => {
     const prisma = getPrismaClient()
-    const {username, id} = auth(req)!
+    const {username, id} = getAuth(req)!
     let tasks
     try {
         tasks = await prisma.todo.findMany({
