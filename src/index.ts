@@ -4,6 +4,7 @@ import express from "express"
 import logger from "morgan"
 import dotenv from "dotenv"
 import cookieParser from "cookie-parser"
+import { rateLimit } from "express-rate-limit"
 import { PrismaClient } from "@prisma/client"
 
 import appRouter from "./routes"
@@ -24,7 +25,13 @@ app.use(logger("dev"))
 app.use(express.json())
 app.use(cookieParser(cookieKey))
 app.use(express.urlencoded({ extended: false }))
+app.use(express)
 app.use(auth)
+const limiter = rateLimit({
+    windowMs: 1000 * 60,
+    limit: 100
+})
+app.use(limiter)
 
 app.use(express.static(path.join(__dirname, '../public')))
 app.set('views', path.join(__dirname, '../views'))
