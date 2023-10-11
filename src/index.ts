@@ -25,7 +25,6 @@ app.use(logger("dev"))
 app.use(express.json())
 app.use(cookieParser(cookieKey))
 app.use(express.urlencoded({ extended: false }))
-app.use(express)
 app.use(auth)
 const limiter = rateLimit({
     windowMs: 1000 * 60,
